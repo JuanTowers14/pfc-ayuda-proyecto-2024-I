@@ -125,6 +125,7 @@ class Itinerario() {
         itinerariosFiltrados.filter(it => convertirAMinutos(it.last.HS, it.last.MS) == salidaMasTarde)
       }
     }
+
   }
 
 }
