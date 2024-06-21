@@ -19,7 +19,7 @@ object App{
 
     val prueba = new BenchMark()
 
-    prueba.itinerariosSalidaBenchmark()
+    prueba.itinerariosSalidaBenchMark()
 
   }
  }

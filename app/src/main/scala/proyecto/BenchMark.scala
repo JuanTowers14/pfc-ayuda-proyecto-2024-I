@@ -17,6 +17,9 @@ class BenchMark {
       Key.exec.benchRuns := 20,
       Key.verbose := false,
     ) withWarmer new Warmer.Default measure {
+      /*
+      objParalelo.itinerariosSalidaPar(vuelosA1, aeropuertos)("HOU", "BNA", 19,20)
+      objParalelo.itinerariosSalidaPar(vuelosB1, aeropuertos)("DEN", "MIA",18, 53)*/
       objSecuencial.itinerarios(vuelosC1, aeropuertos)("PHX", "LAX")
     }
 
@@ -26,35 +29,51 @@ class BenchMark {
       Key.exec.benchRuns := 20,
       Key.verbose := false,
     ) withWarmer new Warmer.Default measure {
+      /*
+      objParalelo.itinerariosSalidaPar(vuelosA1, aeropuertos)("HOU", "BNA")
+      objParalelo.itinerariosSalidaPar(vuelosB1, aeropuertos)("DEN", "MIA")
+      objSecuencial.itinerariosTiempo(vuelosD1, aeropuertos)("PHX", "LAX")
+      */
       objParalelo.itinerariosPar(vuelosC1, aeropuertos)("PHX", "LAX")
     }
 
     println("Prueba de Itinerarios con Lista de Vuelos C1 y Lista Aeropuertos, Buscando El Vuelo de PHX a LAX")
     println("Secuencial: " + timeSecuencial)
     println("Paralela: " + timeParalela)
+
   }
 
   def itinerariosTiempoBenchMark(): Unit = {
 
     val timeSecuencial = config(
-      Key.exec.minWarmupRuns := 500,
-      Key.exec.maxWarmupRuns := 500,
+      Key.exec.minWarmupRuns := 100,
+      Key.exec.maxWarmupRuns := 100,
       Key.exec.benchRuns := 20,
       Key.verbose := false,
     ) withWarmer new Warmer.Default measure {
+      /*
+      objParalelo.itinerariosSalidaPar(vuelosA1, aeropuertos)("HOU", "BNA")
+      objParalelo.itinerariosSalidaPar(vuelosB1, aeropuertos)("DEN", "MIA")
       objSecuencial.itinerariosTiempo(vuelosD1, aeropuertos)("PHX", "LAX")
+      */
+      objSecuencial.itinerariosTiempo(vuelosC1, aeropuertos)("PHX", "LAX")
     }
 
     val timeParalela = config(
-      Key.exec.minWarmupRuns := 500,
-      Key.exec.maxWarmupRuns := 500,
+      Key.exec.minWarmupRuns := 100,
+      Key.exec.maxWarmupRuns := 100,
       Key.exec.benchRuns := 20,
       Key.verbose := false,
     ) withWarmer new Warmer.Default measure {
-      objParalelo.itinerariosTiempoPar(vuelosD1, aeropuertos)("PHX", "LAX")
+      /*
+      objParalelo.itinerariosSalidaPar(vuelosA1, aeropuertos)("HOU", "BNA")
+      objParalelo.itinerariosSalidaPar(vuelosB1, aeropuertos)("DEN", "MIA")
+      objSecuencial.itinerariosTiempo(vuelosD1, aeropuertos)("PHX", "LAX")
+      */
+      objParalelo.itinerariosTiempoPar(vuelosC1, aeropuertos)("PHX", "LAX")
     }
 
-    println("Prueba Aeropuertos Curso Buscando El Vuelo ")
+    println("Prueba de ItinerariosTiempo con Lista de Vuelos B1 y Lista Aeropuertos, Buscando El Vuelo de PHX a LAX")
     println("Secuencial: " + timeSecuencial)
     println("Paralela: " + timeParalela)
 
@@ -67,6 +86,11 @@ class BenchMark {
       Key.exec.benchRuns := 20,
       Key.verbose := false,
     ) withWarmer new Warmer.Default measure {
+      /*
+      objParalelo.itinerariosSalidaPar(vuelosA1, aeropuertos)("HOU", "BNA")
+      objParalelo.itinerariosSalidaPar(vuelosB1, aeropuertos)("DEN", "MIA")
+      objSecuencial.itinerariosTiempo(vuelosD1, aeropuertos)("PHX", "LAX")
+      */
       objSecuencial.itinerariosEscalas(vuelosC1, aeropuertos)("PHX", "LAX")
     }
 
@@ -76,10 +100,15 @@ class BenchMark {
       Key.exec.benchRuns := 20,
       Key.verbose := false,
     ) withWarmer new Warmer.Default measure {
+      /*
+      objParalelo.itinerariosSalidaPar(vuelosA1, aeropuertos)("HOU", "BNA")
+      objParalelo.itinerariosSalidaPar(vuelosB1, aeropuertos)("DEN", "MIA")
+      objSecuencial.itinerariosTiempo(vuelosD1, aeropuertos)("PHX", "LAX")
+      */
       objParalelo.itinerariosEscalasPar(vuelosC1, aeropuertos)("PHX", "LAX")
     }
 
-    println("Prueba Aeropuertos Curso Buscando El Vuelo ")
+    println("Prueba de ItinerariosEscalas con Lista de Vuelos C1 y Lista Aeropuertos, Buscando El Vuelo de PHX a LAX")
     println("Secuencial: " + timeSecuencial)
     println("Paralela: " + timeParalela)
 
@@ -93,6 +122,11 @@ class BenchMark {
       Key.exec.benchRuns := 20,
       Key.verbose := false,
     ) withWarmer new Warmer.Default measure {
+      /*
+      objParalelo.itinerariosSalidaPar(vuelosA1, aeropuertos)("HOU", "BNA")
+      objParalelo.itinerariosSalidaPar(vuelosB1, aeropuertos)("DEN", "MIA")
+      objSecuencial.itinerariosTiempo(vuelosD1, aeropuertos)("PHX", "LAX")
+      */
       objSecuencial.itinerariosAire(vuelosC1, aeropuertos)("PHX", "LAX")
     }
 
@@ -102,10 +136,15 @@ class BenchMark {
       Key.exec.benchRuns := 20,
       Key.verbose := false,
     ) withWarmer new Warmer.Default measure {
+      /*
+      objParalelo.itinerariosSalidaPar(vuelosA1, aeropuertos)("HOU", "BNA")
+      objParalelo.itinerariosSalidaPar(vuelosB1, aeropuertos)("DEN", "MIA")
+      objSecuencial.itinerariosTiempo(vuelosD1, aeropuertos)("PHX", "LAX")
+      */
       objParalelo.itinerariosAirePar(vuelosC1, aeropuertos)("PHX", "LAX")
     }
 
-    println("Prueba Aeropuertos Curso Buscando El Vuelo ")
+    println("Prueba de ItinerariosAire con Lista de Vuelos C1 y Lista Aeropuertos, Buscando El Vuelo de PHX a LAX")
     println("Secuencial: " + timeSecuencial)
     println("Paralela: " + timeParalela)
 
@@ -133,44 +172,10 @@ class BenchMark {
       objParalelo.itinerariosSalidaPar(vuelosC1, aeropuertos)("ATL", "DFW", 15, 10)
     }
 
-    println("Prueba Aeropuertos Curso Buscando El Vuelo ")
-    println("Secuencial: " + timeSecuencial)
-    println("Paralela: " + timeParalela)
+    println("Prueba de ItinerariosAire con Lista de Vuelos C1 y Lista Aeropuertos, Buscando El Vuelo de ATL hasta DFW con una cita a las 15:10 ")
+    println("Secuencial: " + timeParalela)
+    println("Paralela: " + timeSecuencial)
 
-  }
-  def itinerariosSalidaBenchmark(): Unit = {
-
-    val timeParalela5 = config(
-      Key.exec.minWarmupRuns := 100,
-      Key.exec.maxWarmupRuns := 100,
-      Key.exec.benchRuns := 20,
-      Key.verbose := false,
-    ) withWarmer new Warmer.Default measure {
-
-      /*
-      objParalelo.itinerariosSalidaPar(vuelosA1, aeropuertos)("HOU", "BNA", 19,20)
-      objParalelo.itinerariosSalidaPar(vuelosB1, aeropuertos)("DEN", "MIA",18, 53)*/
-      /*objParalelo.itinerariosSalidaPar(vuelosC1, aeropuertos)("SFO", "BOS",5,12)
-      objParalelo.itinerariosSalidaPar(vuelosC1, aeropuertos)("BOS","SFO", 12, 22)*/
-      objParalelo.itinerariosSalidaPar(vuelosC1, aeropuertos)("BOS","SFO", 12, 22)
-    }
-    val timeSecuencial5 = config(
-
-      Key.exec.minWarmupRuns := 100,
-      Key.exec.maxWarmupRuns := 100,
-      Key.exec.benchRuns := 20,
-      Key.verbose := false,
-    ) withWarmer new Warmer.Default measure {
-      objSecuencial.itinerariosSalida(vuelosCurso , aeropuertosCurso)
-      /*
-      objSecuencial.itinerariosSalida(vuelosA1, aeropuertos)("HOU", "BNA", 19,20)
-      objSecuencial.itinerariosSalida(vuelosB1, aeropuertos)("DEN", "MIA",18, 53)*/
-      /*objSecuencial.itinerariosSalida(vuelosC1, aeropuertos)("SFO", "BOS",5,12)
-      objSecuencial.itinerariosSalida(vuelosC1, aeropuertos)("BOS","SFO", 12, 22)*/
-      objSecuencial.itinerariosSalida(vuelosC1, aeropuertos)("BOS","SFO", 12, 22)
-    }
-    println(s"Tiempo de ejecución Salida P5: $timeParalela5")
-    println(s"Tiempo de ejecución Salida S5: $timeSecuencial5")
   }
 
 }

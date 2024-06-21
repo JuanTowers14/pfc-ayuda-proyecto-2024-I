@@ -17,21 +17,17 @@ class ItinerarioPar() {
     // Recibe una lista de vuelos y aeropuertos
     // Retorna una función que recibe los códigos de dos aeropuertos
     // Retorna todos los itinerarios posibles de cod1 a cod2
-    def encontrarRutas(origen: String, destino: String, visitados: Set[String], rutaActual: List[Vuelo]): Future[List[List[Vuelo]]] = {
+    def encontrarRutas(origen: String, destino: String, visitados: Set[String], rutaActual: List[Vuelo]): List[vuelos] = {
       if (origen == destino) {
-        Future.successful(List(rutaActual))
+        List(rutaActual)
       } else {
-        val futuros: List[Future[List[List[Vuelo]]]] = vuelos.filter(v => v.Org == origen && !visitados.contains(v.Dst)).map { vuelo =>
+        vuelos.filter(v => v.Org == origen && !visitados.contains(v.Dst)).flatMap { vuelo =>
           encontrarRutas(vuelo.Dst, destino, visitados + origen, rutaActual :+ vuelo)
         }
-        Future.sequence(futuros).map(_.flatten)
       }
     }
-
     (aeropuertoOrigen: String, aeropuertoDestino: String) => {
-      // Espera el resultado de los futuros para retornarlos como una lista sin Future
-      val futureResult = encontrarRutas(aeropuertoOrigen, aeropuertoDestino, Set(), List())
-      Await.result(futureResult, Duration.Inf)
+      encontrarRutas(aeropuertoOrigen, aeropuertoDestino, Set(), List())
     }
   }
 
@@ -91,24 +87,20 @@ class ItinerarioPar() {
       val transiciones = ruta.size - 1
       escalasIndividuales + transiciones
     }
-
     (aeropuertoOrigen: String, aeropuertoDestino: String) => {
       val futureItinerarios = Future {
         buscarItinerarios(aeropuertoOrigen, aeropuertoDestino)
       }
-
       val futureResultados = futureItinerarios.flatMap { itinerarios =>
         val futureRutas = itinerarios.map { ruta =>
           Future {
             (ruta, calcularEscalas(ruta))
           }
         }
-
         Future.sequence(futureRutas).map { rutasConEscalas =>
           rutasConEscalas.sortBy(_._2).take(3).map(_._1)
         }
       }
-
       Await.result(futureResultados, Duration.Inf)
     }
   }
