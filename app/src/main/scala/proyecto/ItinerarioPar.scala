@@ -163,49 +163,52 @@ class ItinerarioPar() {
       hora * 60 + minutos
     }
 
-    def calcularHoraLlegadaTotal(itinerario: List[Vuelo]): Int = {
-      convertirAMinutos(itinerario.last.HL, itinerario.last.ML)
-    }
-
-    def calcularHoraSalidaTotal(itinerario: List[Vuelo]): Int = {
-      convertirAMinutos(itinerario.head.HS, itinerario.head.MS)
-    }
-
     def calcularLapsoTiempo(horaLlegada: Int, horaCita: Int): Int = {
       val diferencia = horaCita - horaLlegada
       if (diferencia >= 0) diferencia else 1440 + diferencia
     }
 
     def esValido(itinerario: List[Vuelo], tiempoCita: Int): Boolean = {
-      val horaLlegada = calcularHoraLlegadaTotal(itinerario)
+      val horaLlegada = convertirAMinutos(itinerario.last.HL, itinerario.last.ML)
       horaLlegada <= tiempoCita || (horaLlegada < 1440 && tiempoCita < horaLlegada)
     }
 
     (origen: String, destino: String, horaCita: Int, minCita: Int) => {
       val tiempoCita = convertirAMinutos(horaCita, minCita)
-      val todosItinerariosFuturo = Future { buscarItinerariosFn(origen, destino) }
+      val todosItinerarios = Await.result(Future { buscarItinerariosFn(origen, destino) }, Duration.Inf)
 
-      val itinerariosValidosFuturo = todosItinerariosFuturo.flatMap { todosItinerarios =>
-        Future.sequence(todosItinerarios.map(it => Future {
-          if (esValido(it, tiempoCita)) Some(it) else None
-        })).map(_.flatten)
+      val rutasEncontradasFuturas = Future {
+        todosItinerarios.filter(it => esValido(it, tiempoCita))
       }
 
-      val itinerariosOrdenadosFuturo = itinerariosValidosFuturo.flatMap { itinerariosValidos =>
-        Future.sequence(itinerariosValidos.map { it =>
-          Future {
-            val horaLlegada = calcularHoraLlegadaTotal(it)
-            val lapsoTiempo = calcularLapsoTiempo(horaLlegada, tiempoCita)
-            (it, lapsoTiempo, calcularHoraSalidaTotal(it))
-          }
-        })
-      }.map { itinerariosOrdenados =>
-        itinerariosOrdenados.sortBy { case (_, lapsoTiempo, horaSalida) =>
-          (lapsoTiempo, horaSalida)
+      val rutasEncontradas = Await.result(rutasEncontradasFuturas, Duration.Inf)
+
+      if (rutasEncontradas.isEmpty) List.empty
+      else {
+        val ultimaSalidaFuturas = Future.traverse(rutasEncontradas) { ruta =>
+          Future(convertirAMinutos(ruta.last.HS, ruta.last.MS))
         }
-      }
 
-      Await.result(itinerariosOrdenadosFuturo.map(_.headOption.map(_._1).getOrElse(List.empty)), Duration.Inf)
+        val ultimaSalida: Int = Await.result(ultimaSalidaFuturas.map(_.max), Duration.Inf)
+
+        val ultimaSalidaEncontradaFuturas = Future {
+          rutasEncontradas.filter(ruta => convertirAMinutos(ruta.last.HS, ruta.last.MS) == ultimaSalida)
+        }
+
+        val ultimaSalidaEncontrada = Await.result(ultimaSalidaEncontradaFuturas, Duration.Inf)
+
+        val llegadaMasTempranoFuturas = Future.traverse(ultimaSalidaEncontrada) { ruta =>
+          Future(convertirAMinutos(ruta.last.HL, ruta.last.ML) - tiempoCita)
+        }
+
+        val llegadaMasTemprano: Int = Await.result(llegadaMasTempranoFuturas.map(_.min), Duration.Inf)
+
+        val resultadoFinalFuturas = Future {
+          ultimaSalidaEncontrada.filter(ruta => convertirAMinutos(ruta.last.HL, ruta.last.ML) - tiempoCita == llegadaMasTemprano)
+        }
+
+        Await.result(resultadoFinalFuturas, Duration.Inf).head
+      }
     }
   }
 
