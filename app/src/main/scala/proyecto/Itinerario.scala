@@ -103,29 +103,45 @@ class Itinerario() {
     }
   }
 
-  def itinerariosSalida(vuelos: List[Vuelo], aeropuertos:List[Aeropuerto]): (String, String, Int, Int) => List[List[Vuelo]] = {
-    val buscarItinerarios = itinerarios(vuelos, aeropuertos)
+  def itinerariosSalida(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String, Int, Int) => List[Vuelo] = {
+    val buscarItinerariosFn = itinerarios(vuelos, aeropuertos)
 
-    def convertirAMinutos(hora: Int, minutos: Int): Int = hora * 60 + minutos
+    def convertirAMinutos(hora: Int, minutos: Int): Int = {
+      hora * 60 + minutos
+    }
+
+    def calcularHoraLlegadaTotal(itinerario: List[Vuelo]): Int = {
+      convertirAMinutos(itinerario.last.HL, itinerario.last.ML)
+    }
+
+    def calcularHoraSalidaTotal(itinerario: List[Vuelo]): Int = {
+      convertirAMinutos(itinerario.head.HS, itinerario.head.MS)
+    }
+
+    def calcularLapsoTiempo(horaLlegada: Int, horaCita: Int): Int = {
+      val diferencia = horaCita - horaLlegada
+      if (diferencia >= 0) diferencia else 1440 + diferencia
+    }
+
+    def esValido(itinerario: List[Vuelo], tiempoCita: Int): Boolean = {
+      val horaLlegada = calcularHoraLlegadaTotal(itinerario)
+      // Considerar el caso de itinerarios que cruzan medianoche
+      horaLlegada <= tiempoCita || (horaLlegada < 1440 && tiempoCita < horaLlegada)
+    }
 
     (origen: String, destino: String, horaCita: Int, minCita: Int) => {
       val tiempoCita = convertirAMinutos(horaCita, minCita)
+      val todosItinerarios = buscarItinerariosFn(origen, destino)
+      val itinerariosValidos = todosItinerarios.filter(it => esValido(it, tiempoCita))
 
-      val itinerariosGenerales = buscarItinerarios(origen, destino)
-
-      val itinerariosFiltrados = itinerariosGenerales.filter { ruta =>
-        val ultimaLlegada = ruta.last
-        convertirAMinutos(ultimaLlegada.HL, ultimaLlegada.ML) <= tiempoCita &&
-          ruta.forall(vuelo => convertirAMinutos(vuelo.HS, vuelo.MS) < tiempoCita)
+      val itinerariosOrdenados = itinerariosValidos.sortBy { it =>
+        val horaLlegada = calcularHoraLlegadaTotal(it)
+        val lapsoTiempo = calcularLapsoTiempo(horaLlegada, tiempoCita)
+        (lapsoTiempo, -calcularHoraSalidaTotal(it))
       }
 
-      if (itinerariosFiltrados.isEmpty) List()
-      else {
-        val salidaMasTarde = itinerariosFiltrados.map(it => convertirAMinutos(it.last.HS, it.last.MS)).max
-        itinerariosFiltrados.filter(it => convertirAMinutos(it.last.HS, it.last.MS) == salidaMasTarde)
+      itinerariosOrdenados.headOption.getOrElse(List.empty)
       }
     }
-
-  }
 
 }

@@ -37,7 +37,7 @@ class TestPruebasSeq5 extends AnyFunSuite{
 
   test("test4") {
     val its4 = itsCurso15("HOU", "BNA", 14,20)
-    assert(its4 ===List(Vuelo("4X", 373, "HOU", 13, 15, "MSY", 15, 10, 1), Vuelo("AA", 828, "MSY", 17, 10, "BNA", 18, 37, 0)) )
+    assert(its4 === List(Vuelo("4X", 373, "HOU", 13, 15, "MSY", 15, 10, 1), Vuelo("AA", 828, "MSY", 17, 10, "BNA", 18, 37, 0)) )
   }
 
   test("test5") {
